@@ -33,10 +33,13 @@ public class TweenTest : MonoBehaviour
         //s.Append(Camera.DOMove(Pivot1.position, Duration).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
         //s.Join(MovingPivot.DOMove(LookAt1.position, DurationRotaion).SetEase(MovingPivotEasing));
 
-        s.Append(MovingPivot.DOMove(LookAt2.position, DurationRotaion).SetEase(MovingPivotEasing).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
-        s.Append(Camera.DOMove(Pivot2.position, Duration).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
-        s.Append(MovingPivot.DOMove(LookAt1.position, DurationRotaion).SetEase(MovingPivotEasing).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
-        s.Append(Camera.DOMove(Pivot1.position, Duration).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
+        s.Append(MovingPivot.DOMove(LookAt1.position+(LookAt2.position - LookAt1.position) *0.5f, DurationRotaion).SetEase(MovingPivotEasing).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
+        s.Append(MovingPivot.DOMove(LookAt2.position, DurationRotaion));
+        s.Join(Camera.DOMove(Pivot2.position, Duration).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
+
+        s.Append(MovingPivot.DOMove(LookAt2.position + (LookAt1.position - LookAt2.position) * 0.5f, DurationRotaion).SetEase(MovingPivotEasing).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
+        s.Append(MovingPivot.DOMove(LookAt1.position, DurationRotaion));
+        s.Join(Camera.DOMove(Pivot1.position, Duration).OnUpdate(() => { Camera.LookAt(MovingPivot.position); }));
 
         s.SetLoops(-1, LoopType.Restart);
     }
