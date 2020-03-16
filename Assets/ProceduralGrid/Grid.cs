@@ -8,6 +8,7 @@ public class Grid : MonoBehaviour
     public int xSize, ySize;
 
     private Vector3[] vertices;
+    private Vector2[] UV;
     private int[] triangles;
     private Mesh mesh;
 
@@ -34,11 +35,16 @@ public class Grid : MonoBehaviour
         mesh.name = "Procedural Grid";
         yield return new WaitForSeconds(1f);
         vertices = new Vector3[(xSize + 1) * (ySize + 1)];
+        UV = new Vector2[vertices.Length];
+        Vector4[] tangents = new Vector4[vertices.Length];
+        Vector4 tangent = new Vector4(1,0,0,-1);
         for (int i = 0, y = 0; y <= ySize; y++)
         {
             for (int x = 0; x <= xSize; x++, i++)
             {
                 vertices[i] = new Vector3(x, y);
+                UV[i] = new Vector2((float)x/xSize, (float)y /ySize);
+                tangents[i] = tangent;
                 //yield return new WaitForSeconds(0.2f);
             }
         }
@@ -50,18 +56,27 @@ public class Grid : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
 
-        for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++)
-            for (int x = 0; x < xSize; x++, vi++, ti += 6)
+        int vi = 0;
+        int ti = 0;
+        for (int y = 0; y < ySize; y++)
+        {
+            for (int x = 0; x < xSize; x++)
             {
                 triangles[ti] = vi;
-                triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + xSize + 1;
+                triangles[ti + 2] = triangles[ti + 3] = vi + 1;
+                triangles[ti + 1] = triangles[ti + 4] = vi + xSize + 1;
                 triangles[ti + 5] = vi + xSize + 2;
-                mesh.triangles = triangles;
-                yield return new WaitForEndOfFrame();
+                vi += 1;
+                ti += 6;
             }
 
-        
+            vi += 1;
+        }
+
+        mesh.triangles = triangles;
+        mesh.uv = UV;
+        mesh.tangents = tangents;
+        mesh.RecalculateNormals();
     }
 
     private void OnDrawGizmos()
